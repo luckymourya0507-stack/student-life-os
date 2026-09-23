@@ -12,12 +12,13 @@ const demoUser = {
   profileImage: ''
 };
 
-// Initialize Hashed Password
-bcrypt.hash('password123', 10).then((hashed) => {
+// Initialize the demo password before handling authentication requests.
+const ready = bcrypt.hash('password123', 10).then((hashed) => {
   demoUser.password = hashed;
 });
 
 const inMemoryStore = {
+  ready,
   users: [demoUser],
   subjects: [
     { _id: 'sub_1', userId: 'user_demo_123', name: 'Data Structures', code: 'CS201', teacher: 'Dr. Alan Turing', description: 'Arrays, Trees, Graphs & Algorithms' },

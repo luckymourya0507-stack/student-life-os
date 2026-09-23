@@ -8,13 +8,15 @@ const { getIsConnected } = require('../config/db');
 const getDashboardStats = async (req, res) => {
   try {
     if (!getIsConnected()) {
+      const userId = req.user.id || req.user._id;
+      const userTasks = inMemoryStore.tasks.filter((task) => task.userId === userId);
       return res.json({
-        subjects: inMemoryStore.subjects.length,
-        tasks: inMemoryStore.tasks.length,
-        notes: inMemoryStore.notes.length,
-        exams: inMemoryStore.exams.length,
-        completedTasks: inMemoryStore.tasks.filter((t) => t.status === 'Completed').length,
-        pendingTasks: inMemoryStore.tasks.filter((t) => t.status !== 'Completed').length
+        subjects: inMemoryStore.subjects.filter((item) => item.userId === userId).length,
+        tasks: userTasks.length,
+        notes: inMemoryStore.notes.filter((item) => item.userId === userId).length,
+        exams: inMemoryStore.exams.filter((item) => item.userId === userId).length,
+        completedTasks: userTasks.filter((task) => task.status === 'Completed').length,
+        pendingTasks: userTasks.filter((task) => task.status !== 'Completed').length
       });
     }
 

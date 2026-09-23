@@ -9,6 +9,7 @@ const Profile = () => {
 
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
+    email: user?.email || '',
     course: user?.course || '',
     year: user?.year || '',
     profileImage: user?.profileImage || ''
@@ -115,6 +116,19 @@ const Profile = () => {
                 type="text"
                 value={profileData.name}
                 onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                Email Address
+              </label>
+              <input
+                type="email"
+                required
+                value={profileData.email}
+                onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
                 className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>

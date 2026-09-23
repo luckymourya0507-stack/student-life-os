@@ -7,7 +7,8 @@ const getResources = async (req, res) => {
     const { search, type, subject } = req.query;
 
     if (!getIsConnected()) {
-      let list = [...inMemoryStore.resources];
+      const userId = req.user.id || req.user._id;
+      let list = inMemoryStore.resources.filter((resource) => resource.userId === userId);
       if (search) {
         list = list.filter((r) => r.title.toLowerCase().includes(search.toLowerCase()) || r.description.toLowerCase().includes(search.toLowerCase()));
       }
@@ -78,7 +79,7 @@ const updateResource = async (req, res) => {
     const { title, url, type, subject, description } = req.body;
 
     if (!getIsConnected()) {
-      const resource = inMemoryStore.resources.find((r) => r._id === req.params.id);
+      const resource = inMemoryStore.resources.find((r) => r._id === req.params.id && r.userId === (req.user.id || req.user._id));
       if (!resource) return res.status(404).json({ message: 'Resource not found' });
 
       if (title !== undefined) resource.title = title;
@@ -108,10 +109,9 @@ const updateResource = async (req, res) => {
 const deleteResource = async (req, res) => {
   try {
     if (!getIsConnected()) {
-      const index = inMemoryStore.resources.findIndex((r) => r._id === req.params.id);
-      if (index !== -1) {
-        inMemoryStore.resources.splice(index, 1);
-      }
+      const index = inMemoryStore.resources.findIndex((r) => r._id === req.params.id && r.userId === (req.user.id || req.user._id));
+      if (index === -1) return res.status(404).json({ message: 'Resource not found' });
+      inMemoryStore.resources.splice(index, 1);
       return res.json({ message: 'Resource deleted successfully' });
     }
 

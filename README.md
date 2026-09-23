@@ -130,7 +130,8 @@ student-life-os/
 ```env
 PORT=5000
 MONGO_URI=mongodb://127.0.0.1:27017/student-life-os
-JWT_SECRET=super_secret_student_life_os_key_2026_jwt
+JWT_SECRET=replace_with_a_long_random_secret
+FRONTEND_URL=http://localhost:5173
 ```
 
 ### Frontend (`client/.env`)
@@ -198,7 +199,8 @@ Frontend web application will open at: `http://localhost:5173`
 
 1. **Backend Deployment (e.g. Render / Railway / Heroku)**:
    - Deploy `server/` directory.
-   - Set environment variables (`MONGO_URI`, `JWT_SECRET`, `PORT`).
+   - Set environment variables (`MONGO_URI`, `JWT_SECRET`, `PORT`, and `FRONTEND_URL`).
+   - Use a managed MongoDB database. Production startup fails if MongoDB or `JWT_SECRET` is unavailable.
 2. **Frontend Deployment (e.g. Vercel / Netlify)**:
    - Deploy `client/` directory.
    - Set environment variable `VITE_API_URL` to your production backend API domain (e.g., `https://your-api.onrender.com/api`).

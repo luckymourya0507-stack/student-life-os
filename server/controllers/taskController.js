@@ -7,7 +7,8 @@ const getTasks = async (req, res) => {
     const { search, priority, status } = req.query;
 
     if (!getIsConnected()) {
-      let list = [...inMemoryStore.tasks];
+      const userId = req.user.id || req.user._id;
+      let list = inMemoryStore.tasks.filter((task) => task.userId === userId);
       if (search) {
         list = list.filter((t) => t.title.toLowerCase().includes(search.toLowerCase()));
       }
@@ -35,7 +36,7 @@ const getTasks = async (req, res) => {
 const getTaskById = async (req, res) => {
   try {
     if (!getIsConnected()) {
-      const task = inMemoryStore.tasks.find((t) => t._id === req.params.id);
+      const task = inMemoryStore.tasks.find((t) => t._id === req.params.id && t.userId === (req.user.id || req.user._id));
       if (!task) return res.status(404).json({ message: 'Task not found' });
       return res.json(task);
     }
@@ -88,7 +89,7 @@ const updateTask = async (req, res) => {
     const { title, description, dueDate, priority, status } = req.body;
 
     if (!getIsConnected()) {
-      const task = inMemoryStore.tasks.find((t) => t._id === req.params.id);
+      const task = inMemoryStore.tasks.find((t) => t._id === req.params.id && t.userId === (req.user.id || req.user._id));
       if (!task) return res.status(404).json({ message: 'Task not found' });
 
       if (title !== undefined) task.title = title;
@@ -118,10 +119,9 @@ const updateTask = async (req, res) => {
 const deleteTask = async (req, res) => {
   try {
     if (!getIsConnected()) {
-      const index = inMemoryStore.tasks.findIndex((t) => t._id === req.params.id);
-      if (index !== -1) {
-        inMemoryStore.tasks.splice(index, 1);
-      }
+      const index = inMemoryStore.tasks.findIndex((t) => t._id === req.params.id && t.userId === (req.user.id || req.user._id));
+      if (index === -1) return res.status(404).json({ message: 'Task not found' });
+      inMemoryStore.tasks.splice(index, 1);
       return res.json({ message: 'Task deleted successfully' });
     }
 

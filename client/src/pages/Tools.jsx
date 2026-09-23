@@ -87,16 +87,16 @@ button {
   const [codeJs, setCodeJs] = useState(defaultJs);
   const [codeSrcDoc, setCodeSrcDoc] = useState('');
 
-  const runCode = () => {
+  const runCode = (html = codeHtml, css = codeCss, js = codeJs) => {
     const combined = `
       <!DOCTYPE html>
       <html>
         <head>
-          <style>${codeCss}</style>
+          <style>${css}</style>
         </head>
         <body>
-          ${codeHtml}
-          <script>${codeJs}</script>
+          ${html}
+          <script>${js}</script>
         </body>
       </html>
     `;
@@ -104,7 +104,7 @@ button {
   };
 
   useEffect(() => {
-    runCode();
+    runCode(defaultHtml, defaultCss, defaultJs);
   }, []);
 
   const resetCode = () => {
@@ -278,6 +278,15 @@ button {
                   className="w-full p-3 font-mono text-xs bg-slate-900 text-slate-100 rounded-xl focus:outline-none border border-slate-800"
                 />
               </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">JavaScript</label>
+                <textarea
+                  rows={5}
+                  value={codeJs}
+                  onChange={(e) => setCodeJs(e.target.value)}
+                  className="w-full p-3 font-mono text-xs bg-slate-900 text-slate-100 rounded-xl focus:outline-none border border-slate-800"
+                />
+              </div>
             </div>
 
             <div>
@@ -285,6 +294,7 @@ button {
               <iframe
                 title="Code Sandbox Preview"
                 srcDoc={codeSrcDoc}
+                sandbox="allow-scripts"
                 className="w-full h-[360px] bg-white rounded-xl border border-slate-200 dark:border-slate-800 shadow-inner"
               />
             </div>

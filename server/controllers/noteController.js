@@ -7,7 +7,8 @@ const getNotes = async (req, res) => {
     const { search, subject } = req.query;
 
     if (!getIsConnected()) {
-      let list = [...inMemoryStore.notes];
+      const userId = req.user.id || req.user._id;
+      let list = inMemoryStore.notes.filter((note) => note.userId === userId);
       if (search) {
         list = list.filter((n) => n.title.toLowerCase().includes(search.toLowerCase()) || n.content.toLowerCase().includes(search.toLowerCase()));
       }
@@ -36,7 +37,7 @@ const getNotes = async (req, res) => {
 const getNoteById = async (req, res) => {
   try {
     if (!getIsConnected()) {
-      const note = inMemoryStore.notes.find((n) => n._id === req.params.id);
+      const note = inMemoryStore.notes.find((n) => n._id === req.params.id && n.userId === (req.user.id || req.user._id));
       if (!note) return res.status(404).json({ message: 'Note not found' });
       return res.json(note);
     }
@@ -94,7 +95,7 @@ const updateNote = async (req, res) => {
     const { title, content, subject, tags } = req.body;
 
     if (!getIsConnected()) {
-      const note = inMemoryStore.notes.find((n) => n._id === req.params.id);
+      const note = inMemoryStore.notes.find((n) => n._id === req.params.id && n.userId === (req.user.id || req.user._id));
       if (!note) return res.status(404).json({ message: 'Note not found' });
 
       if (title !== undefined) note.title = title;
@@ -127,10 +128,9 @@ const updateNote = async (req, res) => {
 const deleteNote = async (req, res) => {
   try {
     if (!getIsConnected()) {
-      const index = inMemoryStore.notes.findIndex((n) => n._id === req.params.id);
-      if (index !== -1) {
-        inMemoryStore.notes.splice(index, 1);
-      }
+      const index = inMemoryStore.notes.findIndex((n) => n._id === req.params.id && n.userId === (req.user.id || req.user._id));
+      if (index === -1) return res.status(404).json({ message: 'Note not found' });
+      inMemoryStore.notes.splice(index, 1);
       return res.json({ message: 'Note deleted successfully' });
     }
 

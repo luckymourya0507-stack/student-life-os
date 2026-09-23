@@ -7,7 +7,8 @@ const getSubjects = async (req, res) => {
     const { search } = req.query;
 
     if (!getIsConnected()) {
-      let list = [...inMemoryStore.subjects];
+      const userId = req.user.id || req.user._id;
+      let list = inMemoryStore.subjects.filter((subject) => subject.userId === userId);
       if (search) {
         list = list.filter((s) => s.name.toLowerCase().includes(search.toLowerCase()) || s.code.toLowerCase().includes(search.toLowerCase()));
       }
@@ -67,7 +68,7 @@ const updateSubject = async (req, res) => {
     const { name, code, teacher, description } = req.body;
 
     if (!getIsConnected()) {
-      const subject = inMemoryStore.subjects.find((s) => s._id === req.params.id);
+      const subject = inMemoryStore.subjects.find((s) => s._id === req.params.id && s.userId === (req.user.id || req.user._id));
       if (!subject) return res.status(404).json({ message: 'Subject not found' });
 
       if (name !== undefined) subject.name = name;
@@ -95,10 +96,9 @@ const updateSubject = async (req, res) => {
 const deleteSubject = async (req, res) => {
   try {
     if (!getIsConnected()) {
-      const index = inMemoryStore.subjects.findIndex((s) => s._id === req.params.id);
-      if (index !== -1) {
-        inMemoryStore.subjects.splice(index, 1);
-      }
+      const index = inMemoryStore.subjects.findIndex((s) => s._id === req.params.id && s.userId === (req.user.id || req.user._id));
+      if (index === -1) return res.status(404).json({ message: 'Subject not found' });
+      inMemoryStore.subjects.splice(index, 1);
       return res.json({ message: 'Subject deleted successfully' });
     }
 

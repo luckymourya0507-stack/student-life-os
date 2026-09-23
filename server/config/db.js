@@ -17,6 +17,10 @@ const connectDB = async () => {
     isConnected = true;
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
+    if (process.env.NODE_ENV === 'production') {
+      console.error('MongoDB connection is required in production:', error.message);
+      process.exit(1);
+    }
     console.log('--------------------------------------------------');
     console.log('⚠️ Local MongoDB server is currently offline or unreachable.');
     console.log('App will automatically seed & serve initial data in memory.');

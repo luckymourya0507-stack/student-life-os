@@ -7,7 +7,8 @@ const getExams = async (req, res) => {
     const { search } = req.query;
 
     if (!getIsConnected()) {
-      let list = [...inMemoryStore.exams];
+      const userId = req.user.id || req.user._id;
+      let list = inMemoryStore.exams.filter((exam) => exam.userId === userId);
       if (search) {
         list = list.filter((e) => e.examName.toLowerCase().includes(search.toLowerCase()) || e.subject.toLowerCase().includes(search.toLowerCase()));
       }
@@ -71,7 +72,7 @@ const updateExam = async (req, res) => {
     const { examName, subject, date, time, room, description } = req.body;
 
     if (!getIsConnected()) {
-      const exam = inMemoryStore.exams.find((e) => e._id === req.params.id);
+      const exam = inMemoryStore.exams.find((e) => e._id === req.params.id && e.userId === (req.user.id || req.user._id));
       if (!exam) return res.status(404).json({ message: 'Exam not found' });
 
       if (examName !== undefined) exam.examName = examName;
@@ -103,10 +104,9 @@ const updateExam = async (req, res) => {
 const deleteExam = async (req, res) => {
   try {
     if (!getIsConnected()) {
-      const index = inMemoryStore.exams.findIndex((e) => e._id === req.params.id);
-      if (index !== -1) {
-        inMemoryStore.exams.splice(index, 1);
-      }
+      const index = inMemoryStore.exams.findIndex((e) => e._id === req.params.id && e.userId === (req.user.id || req.user._id));
+      if (index === -1) return res.status(404).json({ message: 'Exam not found' });
+      inMemoryStore.exams.splice(index, 1);
       return res.json({ message: 'Exam deleted successfully' });
     }
 
