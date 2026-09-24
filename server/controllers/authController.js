@@ -32,9 +32,10 @@ const registerUser = async (req, res) => {
     if (!getIsConnected()) {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
+      const userId = 'user_' + Date.now();
       const newUser = {
-        _id: 'user_' + Date.now(),
-        id: 'user_' + Date.now(),
+        _id: userId,
+        id: userId,
         name,
         email: email.toLowerCase(),
         password: hashedPassword,
