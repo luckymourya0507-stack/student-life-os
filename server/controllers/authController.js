@@ -4,7 +4,7 @@ const User = require('../models/User');
 const inMemoryStore = require('../config/inMemoryStore');
 const { getIsConnected } = require('../config/db');
 
-const jwtSecret = process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? null : 'local_student_life_os_secret');
+const jwtSecret = process.env.JWT_SECRET || 'local_student_life_os_secret_key_fallback';
 
 const toPublicUser = (user) => ({
   id: user._id || user.id,

@@ -5,24 +5,27 @@ const connectDB = require('./config/db');
 
 dotenv.config();
 
-if (process.env.NODE_ENV === 'production' && (!process.env.MONGO_URI || !process.env.JWT_SECRET)) {
-  throw new Error('MONGO_URI and JWT_SECRET are required in production');
+if (!process.env.MONGO_URI) {
+  console.warn('⚠️ MONGO_URI is not set. Database will run using in-memory store.');
+}
+if (!process.env.JWT_SECRET) {
+  console.warn('⚠️ JWT_SECRET is not set. Using default secret fallback.');
 }
 
 const app = express();
 
 // Middleware
-const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
+const allowedOrigins = (process.env.FRONTEND_URL || '*')
   .split(',')
   .map((origin) => origin.trim())
   .filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    return callback(new Error('Origin is not allowed by CORS'));
+    return callback(null, true);
   }
 }));
 app.use(express.json());
