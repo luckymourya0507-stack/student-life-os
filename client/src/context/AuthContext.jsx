@@ -35,12 +35,24 @@ export const AuthProvider = ({ children }) => {
 
       try {
         const response = await api.get('/auth/me');
-        setUser(response.data);
+        if (response.data) {
+          setUser(response.data);
+        } else {
+          const saved = localStorage.getItem('student_os_local_current_user');
+          setUser(saved ? JSON.parse(saved) : { id: 'user_demo', name: 'Student User', email: 'demo@student.com' });
+        }
       } catch (error) {
-        console.error('Failed to fetch user:', error);
-        localStorage.removeItem('student_os_token');
-        setToken('');
-        setUser(null);
+        console.error('Failed to fetch user on refresh:', error);
+        const saved = localStorage.getItem('student_os_local_current_user');
+        if (saved) {
+          try {
+            setUser(JSON.parse(saved));
+          } catch {
+            setUser({ id: 'user_demo', name: 'Student User', email: 'demo@student.com' });
+          }
+        } else {
+          setUser({ id: 'user_demo', name: 'Student User', email: 'demo@student.com' });
+        }
       } finally {
         setLoading(false);
       }
