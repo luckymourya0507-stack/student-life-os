@@ -197,10 +197,23 @@ Frontend web application will open at: `http://localhost:5173`
 
 ## 🚢 Deployment Instructions
 
-1. **Backend Deployment (e.g. Render / Railway / Heroku)**:
-   - Deploy `server/` directory.
-   - Set environment variables (`MONGO_URI`, `JWT_SECRET`, `PORT`, and `FRONTEND_URL`).
-   - Use a managed MongoDB database. Production startup fails if MongoDB or `JWT_SECRET` is unavailable.
-2. **Frontend Deployment (e.g. Vercel / Netlify)**:
-   - Deploy `client/` directory.
-   - Set environment variable `VITE_API_URL` to your production backend API domain (e.g., `https://your-api.onrender.com/api`).
+### Recommended: Render API + Vercel frontend
+
+1. **Create a MongoDB Atlas database**
+   - Create a database user and allow the deployment service to connect.
+   - Copy the connection string for the Render `MONGO_URI` variable.
+2. **Deploy the backend on Render**
+   - Create a new Blueprint from this repository, or create a Web Service manually.
+   - For a manual service, set root directory to `server`, build command to `npm install`, and start command to `npm start`.
+   - Set `NODE_ENV=production`, `MONGO_URI`, `JWT_SECRET`, and `FRONTEND_URL`.
+   - Set `FRONTEND_URL` to the final Vercel URL after the frontend is created.
+   - The health check endpoint is `/api/health`.
+3. **Deploy the frontend on Vercel**
+   - Import this repository and set the Root Directory to `client`.
+   - Vercel will use `client/vercel.json` and the client build script.
+   - Add `VITE_API_URL=https://your-api.onrender.com/api`.
+4. **Finish the CORS configuration**
+   - Replace the temporary value of Render's `FRONTEND_URL` with the exact Vercel URL.
+   - Redeploy/restart the Render service and verify login plus `/api/health`.
+
+Never commit `.env` files or production secrets. The repository includes `.env.example` files for local setup.
